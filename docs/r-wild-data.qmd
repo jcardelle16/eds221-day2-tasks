@@ -1,0 +1,71 @@
+---
+title: "Mack Creek Salamander and Cutthroat Trout"
+author: "Josephine Cardelle"
+execute: 
+  warning: false
+  echo: false
+  
+---
+
+```{r}
+# load libraries
+library(tidyverse)
+library(here)
+library(janitor)
+
+```
+
+```{r}
+# read in the data
+mack_verts <- read_csv(here("data", "AS00601.csv"))
+view(mack_verts)
+
+# cleaning variable names
+mack_verts <- mack_verts %>% clean_names()
+```
+
+
+```{r}
+# exploring data
+mc_wt_5 <- mack_verts$weight[5]
+mc_wt_5
+mc_length_8_20 <- mack_verts$length1[8:20]
+mc_length_8_20
+mc_dates <- c(mack_verts$sampledate)
+```
+
+
+```{r}
+# salamander subset
+mc_salamanders <- filter(mack_verts, species == "DITE")
+
+# scatterplot of salamander length x weight
+ggplot(mc_salamanders, 
+       aes(x = length1, 
+           y = weight)) +
+  geom_point(aes(color = length1)) +
+  scale_color_gradient(high = "red", low = "blue") +
+  labs(title = "Salamander Size", 
+       x = "Snout-vent Length (mm)", 
+       y = "Weight (grams)",
+       subtitle = "length x width"
+       ) +
+  theme_minimal()
+
+ggsave(here::here("figs", "salamander_size.png"), height = 6, width = 7)
+```
+
+
+```{r}
+mc_trout <- filter(mack_verts, species == "ONCL")
+
+ggplot(mc_trout, aes(x = length1, y = weight)) + 
+  geom_point(aes(color = reach)) +
+labs(title = "Trout",
+     x = "length (mm)",
+     y = "weight (grams)") +
+  facet_wrap(~reach)
+
+ggsave(here::here("figs", "cutthroat_size.png"), height = 6, width = 7)
+```
+
